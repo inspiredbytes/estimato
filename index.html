@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Estimato</title>
+
+    <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro' rel='stylesheet' type='text/css'>
+    <link href='main.css' rel='stylesheet' />
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+    <script>
+      $( document ).ready(function() {
+        $('label').first().addClass('active').children('input').focus();
+
+        $('label').on('mouseover', function() {
+          $('label').removeClass('active');
+          $(this).addClass('active').children('input').select();
+          checkForValue($(this));
+        });
+
+        $('label').on('mouseleave', function() {
+          if ($('label input').is(':focus') != true) {
+            $(this).removeClass('active').children('input').blur();
+          }
+          checkForValue($(this));
+        });
+
+        $('label input').on('focus', function() {
+          $('label').removeClass('active');
+          $(this).parent('label').addClass('active');
+          checkForValue($(this).parent('label'));
+        });
+
+        $('label input').on('blur', function() {
+          $('label').removeClass('active');
+          checkForValue($(this).parent('label'));
+        });
+
+        $('label input').on('focusout', function() {
+          checkForValue($(this).parent('label'));
+        });
+
+        $('label input').on('keyup', function() {
+          checkIfDone();
+        });
+
+        $('label input').on('keypress', function() {
+          checkIfDone();
+        });
+
+        $('.total input').on('mouseover', function() {
+          $(this).select();
+        });
+
+        $('.front-loader').on('focus', function() {
+          $('label').first().focus();
+          $('label input').first().select();
+        });
+
+        function checkForValue(_this) {
+          if (_this.children('input').val() != "") {
+            _this.addClass('done');
+          } else {
+            _this.removeClass('done');
+          }
+
+          checkIfDone();
+        }
+
+        function checkIfDone() {
+          var done = true;
+
+          $('label input').each(function() {
+            if ($(this).val() == "" || isNaN(parseFloat($(this).val()))) {
+              done = false;
+            }
+          });
+
+          if (done == true) {
+            calculate();
+
+            $('.total').removeClass('hide');
+            $('.title').removeClass('hide');
+          } else {
+            $('.total').addClass('hide');
+            $('.title').addClass('hide');
+          }
+        }
+
+        function calculate() {
+          var realistic = parseFloat($('#realistic input').val());
+          var optimistic = parseFloat($('#optimistic input').val());
+          var pessimistic = parseFloat($('#pessimistic input').val());
+
+          $('.total input').val(weightedMean(optimistic, realistic, pessimistic));
+        }
+
+        function weightedMean(optimistic, realistic, pessimistic) {
+          return ((optimistic + (4 * realistic) + pessimistic) / 6.0).toFixed(2);
+        };
+      });
+    </script>
+  </head>
+
+  <body>
+    <div class="app">
+      <h1>Estimato</h1>
+      <section>
+        <div class="column third">
+          <label id="optimistic">Optimistic
+            <input type="text" placeholder="-" tabindex="1"/>
+          </label>
+        </div>
+
+        <div class="column third">
+          <label id="realistic">Realistic
+            <input type="text" placeholder="-" tabindex="2"/>
+          </label>
+        </div>
+
+        <div class="column third">
+          <label id="pessimistic">Pessimistic
+            <input type="text" placeholder="-" tabindex="3"/>
+          </label>
+        </div>
+
+        <div class="front-loader" tabindex="4"></div>
+      </section>
+
+      <section>
+        <div class="column full">
+          <div class="total hide">
+            <span class="title">Total</span>
+            <input type="text" readonly>
+          </div>
+        </div>
+      </section>
+    </div>
+  </body>
+</html>
