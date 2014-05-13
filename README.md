@@ -1,4 +1,3 @@
-estimato
-========
+###estimato
 
-An easy way to do PERT estimates
+A simple, easy way to calculate PERT estimates.
